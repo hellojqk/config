@@ -1,0 +1,4 @@
+# 数据库连接字符串
+connectionString: mongodb://localhost:27017
+dataBase: "config"
+serverPort: "8080"

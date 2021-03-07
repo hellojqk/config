@@ -1,0 +1,46 @@
+ syntax = "proto3";
+ package config.service.v1;
+ option go_package = "github.com/hellojqk/config/service/v1";
+
+import "google/api/annotations.proto";
+
+message GroupCreateRequest {
+  string value = 1;
+}
+message GroupCreateReply {
+  string value = 1;
+}
+
+message GroupQueryRequest {
+  string key = 1;
+}
+message GroupQueryReply {
+  string key = 1;
+}
+
+message GroupListRequest {
+  string value = 1;
+}
+message GroupListReply {
+  string value = 1;
+}
+
+
+service GroupService {
+  rpc Create(GroupCreateRequest) returns (GroupCreateReply) {
+    option (google.api.http) = {
+      post: "/v1/group"
+      body: "*"
+    };
+  }
+  rpc Query(GroupQueryRequest) returns (GroupQueryReply) {
+    option (google.api.http) = {
+      get: "/v1/group/{key}"
+    };
+  }
+  rpc List(GroupListRequest) returns (GroupListReply) {
+    option (google.api.http) = {
+      get: "/v1/group"
+    };
+  }
+}

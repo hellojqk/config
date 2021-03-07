@@ -1,0 +1,17 @@
+ syntax = "proto3";
+ package config.service.v1;
+ option go_package = "github.com/hellojqk/config/service/v1";
+
+import "google/api/annotations.proto";
+
+
+message StructCreateRequest {
+  string key = 1;
+  string name = 2;
+  string description = 3;
+  bool secret=4;
+bool array=5;
+}
+message StructCreateReply {
+  string value = 1;
+}
