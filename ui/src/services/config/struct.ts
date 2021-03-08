@@ -10,9 +10,17 @@ export async function addStruct(struct: config.ConfigStruct) {
     });
 }
 
+export async function updateStruct(structKey: string, struct: config.ConfigStruct) {
+    return request<config.ConfigStruct>(`/api/struct/${structKey}`, {
+        method: 'PUT',
+        data: struct
+    });
+}
+
+
 export async function findStruct(params: any) {
     return request<config.ConfigStruct>('/api/struct', {
         method: 'GET',
-        params:params
+        params: params
     });
 }

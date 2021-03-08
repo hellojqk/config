@@ -68,3 +68,9 @@ func TestConfigStruct_Find(t *testing.T) {
 	assert.Equal(t, nil, err)
 	t.Logf("%v\n", result)
 }
+
+func TestConfigStruct_UpdateOne(t *testing.T) {
+	result, err := structConfigService.UpdateOne(context.Background(), "key", entity.ConfigStruct{Title: "title"})
+	assert.Equal(t, nil, err)
+	t.Logf("%v\n", result)
+}

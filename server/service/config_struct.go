@@ -72,7 +72,15 @@ func (s *ConfigStruct) Find(ctx context.Context, param entity.ListPagingParam) (
 // UpdateOne .
 func (s *ConfigStruct) UpdateOne(ctx context.Context, structKey string, model entity.ConfigStruct) (result interface{}, err error) {
 	model.Update(0)
-	updateResult, err := newCollection().UpdateOne(ctx, bson.M{"key": structKey}, model)
+	updateResult, err := newCollection().UpdateOne(ctx, bson.M{"key": structKey}, bson.M{"$set": bson.M{
+		"title":          model.Title,
+		"description":    model.Description,
+		"secret":         model.Secret,
+		"array":          model.Array,
+		"schema":         model.Schema,
+		"update_time":    model.UpdateTime,
+		"update_user_id": model.UpdateUserID,
+	}})
 	if err != nil {
 		return nil, err
 	}

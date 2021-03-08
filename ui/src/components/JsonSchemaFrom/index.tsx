@@ -1,9 +1,9 @@
 import React from 'react';
 
-import type { JSONSchema7 } from 'json-schema';
+import type { JSONSchema7, JSONSchema7Object } from 'json-schema';
 
 import styles from './index.less';
-import { Button, Form, Input, InputNumber, Switch } from 'antd';
+import { Button, Form, Input, InputNumber, Radio, Switch } from 'antd';
 import { CheckOutlined, CloseOutlined, MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 
 const formItemLayout = { labelCol: { span: 4 }, wrapperCol: { span: 18 } }
@@ -61,7 +61,7 @@ const JsonSchemaFormItemObject: React.FC<JsonSchemaFormProps> = (props) => {
             switch (childPropSchema.type) {
                 case "string":
                     return <Form.Item {...formItemLayout} name={[...fieldKey, childPropKey]} label={childPropSchema?.title} tooltip={childPropSchema?.description} initialValue={childPropSchema?.default} required={schema.required?.includes(childPropKey)} >
-                        <Input />
+                        <Input min={childPropSchema?.minLength} max={childPropSchema?.maxLength}/>
                     </Form.Item>
                 case "integer":
                     return <Form.Item {...formItemLayout} name={[...fieldKey, childPropKey]} label={childPropSchema?.title} tooltip={childPropSchema?.description} initialValue={childPropSchema?.default} required={schema.required?.includes(childPropKey)} >
@@ -93,7 +93,7 @@ const JsonSchemaFormItemObject: React.FC<JsonSchemaFormProps> = (props) => {
                                                 case "string":
                                                     return <Form.Item required={false} key={field.key}>
                                                         <Form.Item {...field} style={{ width: "50%" }}>
-                                                            <Input />
+                                                            <Input min={childPropSchema?.minLength} max={childPropSchema?.maxLength} />
                                                         </Form.Item>
                                                         {fields.length > 1 ? (<MinusCircleOutlined className={styles['dynamic-delete-button']} onClick={() => remove(field.name)} />) : null}
                                                     </Form.Item>
