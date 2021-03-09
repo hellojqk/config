@@ -82,10 +82,10 @@ func (s *ConfigStruct) Find(c *gin.Context) {
 	}
 	util.PrintJSON("ConfigStruct Find", param)
 
-	result, err := structConfigService.Find(context.Background(), param)
+	total, result, err := structConfigService.Find(context.Background(), param)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{"total": total, "data": result})
 }

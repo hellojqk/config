@@ -43,7 +43,7 @@ func (s *ConfigStruct) FindOne(ctx context.Context, structKey string) (result *e
 }
 
 // Find .
-func (s *ConfigStruct) Find(ctx context.Context, param entity.ListPagingParam) (result []entity.ConfigStruct, err error) {
+func (s *ConfigStruct) Find(ctx context.Context, param entity.ListPagingParam) (total int64, result []entity.ConfigStruct, err error) {
 	if param.Filter == nil {
 		param.Filter = bson.M{}
 	}
@@ -51,10 +51,17 @@ func (s *ConfigStruct) Find(ctx context.Context, param entity.ListPagingParam) (
 		param.Sort = bson.M{}
 	}
 	util.PrintJSON("ConfigStruct Find", param)
+	total, err = newCollection().CountDocuments(ctx, param.Filter)
+	if err != nil {
+		return 0, nil, err
+	}
+	if total < 1 {
+		return 0, nil, err
+	}
 	cur, err := newCollection().Find(ctx, param.Filter, options.Find().SetSort(param.Sort).SetLimit(param.PageSize).SetSkip((param.PageNum-1)*param.PageSize))
 
 	if err != nil {
-		return nil, err
+		return 0, nil, err
 	}
 
 	for cur.Next(ctx) {
@@ -66,7 +73,7 @@ func (s *ConfigStruct) Find(ctx context.Context, param entity.ListPagingParam) (
 		result = append(result, model)
 	}
 
-	return result, nil
+	return total, result, nil
 }
 
 // UpdateOne .

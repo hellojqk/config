@@ -16,4 +16,9 @@ declare namespace config {
         array?: boolean;
         schema?: string;
     }
+
+    type ConfigData = Base & {
+        key?: string;
+        data?: any;
+    }
 }

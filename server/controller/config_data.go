@@ -82,6 +82,12 @@ func (s *ConfigData) FindOne(c *gin.Context) {
 // Find .
 // /api/struct?page_num=1&page_size=10
 func (s *ConfigData) Find(c *gin.Context) {
+	var m model.URI
+	if err := c.ShouldBindUri(&m); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		return
+	}
+
 	var param = entity.ListPagingParam{}
 	if err := c.ShouldBind(&param); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
@@ -89,10 +95,10 @@ func (s *ConfigData) Find(c *gin.Context) {
 	}
 	util.PrintJSON("ConfigData Find", param)
 
-	result, err := structDataService.Find(context.Background(), param)
+	total, result, err := structDataService.Find(context.Background(), m.StructKey, param)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{"total": total, "data": result})
 }

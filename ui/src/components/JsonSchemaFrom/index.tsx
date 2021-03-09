@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import type { JSONSchema7, JSONSchema7Object } from 'json-schema';
 
@@ -17,6 +17,8 @@ const formItemLayoutWithOutLabel = {
 type JsonSchemaFormProps = {
     schema: JSONSchema7;
     fieldKey: any[];
+    onSave?: (values: any) => void,
+    values?: any
 }
 
 // const JsonSchemaFormItemArray: React.FC<JsonSchemaFormProps> = (props) => {
@@ -61,7 +63,7 @@ const JsonSchemaFormItemObject: React.FC<JsonSchemaFormProps> = (props) => {
             switch (childPropSchema.type) {
                 case "string":
                     return <Form.Item {...formItemLayout} name={[...fieldKey, childPropKey]} label={childPropSchema?.title} tooltip={childPropSchema?.description} initialValue={childPropSchema?.default} required={schema.required?.includes(childPropKey)} >
-                        <Input min={childPropSchema?.minLength} max={childPropSchema?.maxLength}/>
+                        <Input min={childPropSchema?.minLength} max={childPropSchema?.maxLength} />
                     </Form.Item>
                 case "integer":
                     return <Form.Item {...formItemLayout} name={[...fieldKey, childPropKey]} label={childPropSchema?.title} tooltip={childPropSchema?.description} initialValue={childPropSchema?.default} required={schema.required?.includes(childPropKey)} >
@@ -150,9 +152,10 @@ const JsonSchemaFormItemObject: React.FC<JsonSchemaFormProps> = (props) => {
                         }
                     </Form.Item>
                 default:
-                    return <Form.Item {...formItemLayout} name={childPropKey} label={childPropSchema?.title} tooltip={childPropSchema?.description} initialValue={childPropSchema?.default} required={schema.required?.includes(childPropKey)} >
-                        <Input />
-                    </Form.Item>
+                    return <></>
+                // return <Form.Item {...formItemLayout} name={childPropKey} label={childPropSchema?.title} tooltip={childPropSchema?.description} initialValue={childPropSchema?.default} required={schema.required?.includes(childPropKey)} >
+                //     <Input />
+                // </Form.Item>
             }
         })}
     </>
@@ -161,10 +164,15 @@ const JsonSchemaFormItemObject: React.FC<JsonSchemaFormProps> = (props) => {
 const JsonSchemaForm: React.FC<JsonSchemaFormProps> = (props) => {
     const [form] = Form.useForm();
 
-    const { schema } = props;
+    const { schema, onSave, values } = props;
+
+    useEffect(() => {
+        form.setFieldsValue(values);
+    }, [values])
 
     const onFinish = (values: any) => {
         console.log('表单数据: ', values);
+        onSave && onSave(values);
     };
 
     const onValuesChange = (changedValues: any, allValues: any) => {

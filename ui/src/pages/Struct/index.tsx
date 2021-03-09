@@ -16,12 +16,13 @@ import styles from './index.less';
 
 import type { JSONSchema7 } from 'json-schema';
 import { CheckOutlined, CloseOutlined, MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
-import { addStruct, findStruct, updateStruct } from '@/services/config/struct';
+import { insertStruct, findStruct, updateStruct } from '@/services/config/struct';
 import type config from 'config/config';
 import JsonSchemaForm from '@/components/JsonSchemaFrom';
 import type { ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import moment from 'moment';
+import DataEditor from './components/Data';
 
 // Make modifications to the theme with your own fields and widgets
 
@@ -39,6 +40,8 @@ export default () => {
     const [activeKey, setActiveKey] = useState<string>("list")
     const [schema, setSchema] = useState<any>({})
     const [editStatus, setEditStatus] = useState<string>("add")
+
+    const [structKey, setStructKey] = useState<string>("")
 
     const columnKey = {
         title: "唯一标识",
@@ -75,7 +78,7 @@ export default () => {
         key: "array",
         description: "默认情况下所有配置存储在同一个表中，不支持复杂查询。如有大量重复结构的数据，开启此配置后将独立存储，支持独立列表查询。",
         tooltip: "默认情况下所有配置存储在同一个表中，不支持复杂查询。如有大量重复结构的数据，开启此配置后将独立存储，支持独立列表查询。",
-        render: (text: ReactNode, record: config.ConfigStruct) => <Switch disabled checked={record.secret} checkedChildren={<CheckOutlined />} unCheckedChildren={<CloseOutlined />} />
+        render: (text: ReactNode, record: config.ConfigStruct) => <Switch disabled checked={record.array} checkedChildren={<CheckOutlined />} unCheckedChildren={<CloseOutlined />} />
     }
     const columnSchema = {
         title: "结构",
@@ -124,7 +127,12 @@ export default () => {
                 }}>编辑</a>,
                 <a key="edit">历史</a>,
                 <a key="edit">查看</a>,
-                <a key="edit">数据维护</a>,
+                <a key="edit" onClick={() => {
+                    setActiveKey("structDataManager");
+                    if (record.key) {
+                        setStructKey(record.key);
+                    }
+                }}>数据维护</a>,
             ],
         },
     ];
@@ -139,7 +147,7 @@ export default () => {
                 message.info(result);
             })
         } else {
-            addStruct(values).then(result => {
+            insertStruct(values).then(result => {
                 message.info(result);
             })
         }
@@ -156,9 +164,9 @@ export default () => {
         <PageContainer title={false} className={styles.main}>
             <Tabs defaultActiveKey="1" activeKey={activeKey} onTabClick={(key) => { setActiveKey(key) }}>
                 <TabPane tab="查看" key="list">
-                    <ProTable columns={columns} request={(params) => (findStruct({ page_num: params.current, page_size: params.pageSize }).then((result) => { return { data: result } }))}></ProTable>
+                    <ProTable size='small' columns={columns} request={(params) => (findStruct({ page_num: params.current, page_size: params.pageSize }))}></ProTable>
                 </TabPane>
-                <TabPane tab="编辑" key="edit">
+                <TabPane tab="结构编辑" key="edit">
                     <Row>
                         <Col span={10}><Form
                             form={form}
@@ -206,8 +214,11 @@ export default () => {
                                 <Button type="dashed" htmlType="reset">重置</Button>
                             </Form.Item>
                         </Form></Col>
-                        <Col span={14}><JsonSchemaForm propKey={[]} schema={schema}></JsonSchemaForm></Col>
+                        <Col span={14}><JsonSchemaForm fieldKey={[]} schema={schema}></JsonSchemaForm></Col>
                     </Row>
+                </TabPane>
+                <TabPane tab="结构数据维护" key="structDataManager">
+                    <DataEditor structKey={structKey} />
                 </TabPane>
             </Tabs>
         </PageContainer >

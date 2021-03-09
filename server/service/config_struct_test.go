@@ -64,9 +64,9 @@ func TestConfigStruct_FindOne(t *testing.T) {
 }
 
 func TestConfigStruct_Find(t *testing.T) {
-	result, err := structConfigService.Find(context.Background(), entity.ListPagingParam{PageNum: 1, PageSize: 10, Filter: bson.M{"key": bson.M{"$regex": "key"}}, Sort: bson.M{"key": -1}})
+	total, result, err := structConfigService.Find(context.Background(), entity.ListPagingParam{PageNum: 1, PageSize: 10, Filter: bson.M{"key": bson.M{"$regex": "key"}}, Sort: bson.M{"key": -1}})
 	assert.Equal(t, nil, err)
-	t.Logf("%v\n", result)
+	t.Logf("%d\n%v\n", total, result)
 }
 
 func TestConfigStruct_UpdateOne(t *testing.T) {
