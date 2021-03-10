@@ -2,7 +2,7 @@ import { PageContainer } from '@ant-design/pro-layout';
 import React, { useState, useEffect, ReactNode } from 'react';
 import { message, Spin } from 'antd';
 import styles from './index.less';
-import JsonSchemaForm from '@/components/JsonSchemaFrom';
+import JSONSchemaForm from '@/components/JSONSchemaForm';
 import type { JSONSchema7, JSONSchema7Object } from 'json-schema';
 import { findOneStruct } from '@/services/config/struct';
 import { findData, findOneData, insertData, updateData } from '@/services/config/data';
@@ -78,7 +78,7 @@ const DataEditor: React.FC<DataEditorProps> = (props) => {
         <>
             <div>{structInfo?.title}数据管理</div>
             {structInfo && structInfo.schema && <>
-                {!structInfo.array ? <JsonSchemaForm fieldKey={[]} values={structDataInfo?.data} onSave={onSave} schema={JSON.parse(structInfo?.schema)}></JsonSchemaForm> :
+                {!structInfo.array ? <JSONSchemaForm values={structDataInfo?.data} onSave={onSave} schema={JSON.parse(structInfo?.schema)}></JSONSchemaForm> :
                     <ProTable size='small' columns={structDataColumns}
                         request={(params) => (findData(structKey, { page_num: params.current, page_size: params.pageSize }))}
                     ></ProTable>}

@@ -18,11 +18,11 @@ import type { JSONSchema7 } from 'json-schema';
 import { CheckOutlined, CloseOutlined, MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import { insertStruct, findStruct, updateStruct } from '@/services/config/struct';
 import type config from 'config/config';
-import JsonSchemaForm from '@/components/JSONSchemaFrom';
 import type { ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import moment from 'moment';
 import DataEditor from './components/Data';
+import JSONSchemaForm from '@/components/JSONSchemaForm';
 
 // Make modifications to the theme with your own fields and widgets
 
@@ -214,7 +214,7 @@ export default () => {
                                 <Button type="dashed" htmlType="reset">重置</Button>
                             </Form.Item>
                         </Form></Col>
-                        <Col span={14}><JsonSchemaForm fieldKey={[]} schema={schema}></JsonSchemaForm></Col>
+                        <Col span={14}><JSONSchemaForm schema={schema}></JSONSchemaForm></Col>
                     </Row>
                 </TabPane>
                 <TabPane tab="结构数据维护" key="structDataManager">

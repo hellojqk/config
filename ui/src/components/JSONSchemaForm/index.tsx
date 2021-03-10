@@ -1,28 +1,24 @@
 import React, { useEffect } from 'react';
 
-import type { JSONSchema7, JSONSchema7Object } from 'json-schema';
+import type { JSONSchema7 } from 'json-schema';
 
-import styles from './index.less';
-import { Button, Card, Form, Input, InputNumber, Radio, Switch } from 'antd';
-import { CheckOutlined, CloseOutlined, MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
+// import styles from './index.less';
+import { Button, Form, } from 'antd';
+import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import ProForm, { ProFormDigit, ProFormGroup, ProFormList, ProFormSwitch, ProFormText } from '@ant-design/pro-form';
 
 const formItemLayout = { labelCol: { span: 4 }, wrapperCol: { span: 20 } }
 
-const formItemLayoutWithOutLabel = {
-    wrapperCol: {
-        xs: { span: 12, offset: 0 },
-        sm: { span: 12, offset: 2 },
-    },
-};
-type JsonSchemaFormProps = {
+type JSONSchemaFormProps = {
     schema: JSONSchema7;
-    fieldKey: any[];
     onSave?: (values: any) => void,
     values?: any
 }
+type JSONSchemaFormObjectProps = JSONSchemaFormProps & {
+    fieldKey: any[];
+}
 
-const JSONSchemeForm: React.FC<JsonSchemaFormProps> = (props) => {
+const JSONSchemaFormObject: React.FC<JSONSchemaFormObjectProps> = (props) => {
     const { schema, fieldKey } = props;
     return <>
         {Object.keys(schema.properties || {}).map(childPropKey => {
@@ -43,7 +39,7 @@ const JSONSchemeForm: React.FC<JsonSchemaFormProps> = (props) => {
                 case "object":
                     return <Form.Item {...formItemLayout} label={childPropSchema?.title} tooltip={childPropSchema?.description} initialValue={childPropSchema?.default} required={schema.required?.includes(childPropKey)} >
                         {/* {JSON.stringify([...fieldKey, childPropKey])} */}
-                        <JSONSchemeForm fieldKey={[...fieldKey, childPropKey]} schema={childPropSchema} />
+                        <JSONSchemaFormObject fieldKey={[...fieldKey, childPropKey]} schema={childPropSchema} />
                     </Form.Item>
                 case "array":
                     const arrayFieldSchema = childPropSchema.items as JSONSchema7
@@ -63,7 +59,7 @@ const JSONSchemeForm: React.FC<JsonSchemaFormProps> = (props) => {
                             break
                         case "object":
                             // console.log(JSON.stringify(arrayFieldSchema))
-                            childComps = <ProFormGroup style={{ width: "200%" }}><JSONSchemeForm fieldKey={[...fieldKey]} schema={arrayFieldSchema} /></ProFormGroup>
+                            childComps = <ProFormGroup style={{ width: "200%" }}><JSONSchemaFormObject fieldKey={[...fieldKey]} schema={arrayFieldSchema} /></ProFormGroup>
                             break
                         default:
                             return <></>
@@ -78,7 +74,7 @@ const JSONSchemeForm: React.FC<JsonSchemaFormProps> = (props) => {
     </>
 }
 
-const JsonSchemaForm: React.FC<JsonSchemaFormProps> = (props) => {
+const JSONSchemaForm: React.FC<JSONSchemaFormProps> = (props) => {
     const [form] = Form.useForm();
 
     const { schema, onSave, values } = props;
@@ -105,7 +101,7 @@ const JsonSchemaForm: React.FC<JsonSchemaFormProps> = (props) => {
                 onFinish={onFinish}
                 onValuesChange={onValuesChange}
             >
-                <JSONSchemeForm fieldKey={[]} schema={schema} ></JSONSchemeForm>
+                <JSONSchemaFormObject fieldKey={[]} schema={schema} ></JSONSchemaFormObject>
                 <Form.Item wrapperCol={{ offset: 4 }}>
                     <Button type="primary" htmlType="submit">保存</Button>
                 </Form.Item>
@@ -114,4 +110,4 @@ const JsonSchemaForm: React.FC<JsonSchemaFormProps> = (props) => {
     );
 };
 
-export default JsonSchemaForm;
+export default JSONSchemaForm;
