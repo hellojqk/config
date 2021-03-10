@@ -23,6 +23,8 @@ import ProTable from '@ant-design/pro-table';
 import moment from 'moment';
 import DataEditor from './components/Data';
 import JSONSchemaForm from '@/components/JSONSchemaForm';
+import ProForm, { ProFormSwitch, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
+import FormItemInput from 'antd/lib/form/FormItemInput';
 
 // Make modifications to the theme with your own fields and widgets
 
@@ -120,7 +122,11 @@ export default () => {
             valueType: 'option',
             render: (_, record: config.ConfigStruct) => [
                 <a key="edit" onClick={() => {
-                    setSchema(JSON.parse(record.schema || "{}"));
+                    try {
+                        setSchema(JSON.parse(record.schema || "{}"));
+                    } catch (error) {
+
+                    }
                     form.setFieldsValue(record);
                     setActiveKey("edit");
                     setEditStatus("update")
@@ -155,6 +161,13 @@ export default () => {
 
     const onValuesChange = (changedValues: any, allValues: any) => {
         console.log(changedValues, allValues, form)
+
+        try {
+            const json = JSON.parse(allValues.schema);
+            setSchema(json);
+        } catch (error) {
+            console.log(error);
+        }
     }
 
 
@@ -164,11 +177,19 @@ export default () => {
         <PageContainer title={false} className={styles.main}>
             <Tabs defaultActiveKey="1" activeKey={activeKey} onTabClick={(key) => { setActiveKey(key) }}>
                 <TabPane tab="结构列表" key="list">
-                    <ProTable size='small' columns={columns} request={(params) => (findStruct({ page_num: params.current, page_size: params.pageSize }))}></ProTable>
+                    <ProTable size='small' columns={columns}
+                        toolBarRender={
+                            () => [<Button type="primary" size='small' onClick={() => {
+                                setActiveKey("edit");
+                                setEditStatus("add")
+                            }}>新增</Button>]
+                        }
+                        request={(params) => (findStruct({ page_num: params.current, page_size: params.pageSize }))}></ProTable>
                 </TabPane>
                 <TabPane tab="结构新增" key="edit">
                     <Row>
-                        <Col span={10}><Form
+                        <Col span={10}><ProForm
+                            layout='horizontal'
                             form={form}
                             name="validate_other"
                             {...formItemLayout}
@@ -176,45 +197,19 @@ export default () => {
                             onReset={() => { setStructFormData({}); setSchema({}); setEditStatus("add"); form.resetFields() }}
                             onValuesChange={onValuesChange}
                         >
-                            <Form.Item name="key" wrapperCol={{ span: 4 }} required label={columnKey.title} tooltip={columnKey.description}
-                                rules={[{ required: true, message: "请输入结构标识" }, { pattern: /^\w+$/, message: '仅支持数字、字母及下划线' }]}
-                            >
-                                <Input disabled={editStatus === "update"} />
-                            </Form.Item>
-                            <Form.Item name="title" wrapperCol={{ span: 8 }} required label={columnTitle.title} tooltip={columnTitle.description}
-                                rules={[{ required: true, message: "请输入结构名称" }]}
-                            >
-                                <Input />
-                            </Form.Item>
-                            <Form.Item name="description" wrapperCol={{ span: 8 }} label={columnDescription.title} tooltip={columnDescription.description}
-                            >
-                                <Input.TextArea />
-                            </Form.Item>
-                            <Form.Item name="secret" valuePropName="checked" label={columnSecret.title} tooltip={columnSecret.description}>
-                                <Switch checkedChildren={<CheckOutlined />} unCheckedChildren={<CloseOutlined />} />
-                            </Form.Item>
-                            <Form.Item name="array" valuePropName="checked" label={columnArray.title} tooltip={columnArray.description}>
-                                <Switch checkedChildren={<CheckOutlined />} unCheckedChildren={<CloseOutlined />} />
-                            </Form.Item>
-                            <Form.Item label="结构" tooltip='json-schema格式数据' required>
-                                <Form.Item name='schema' noStyle>
-                                    <Input.TextArea autoSize onChange={(e) => {
-                                        console.log("e", e.target.value);
-                                        try {
-                                            const json = JSON.parse(e.target.value);
-                                            setSchema(json);
-                                        } catch (error) {
-                                            console.log(error);
-                                        }
-                                    }} />
-                                </Form.Item>
-                            </Form.Item>
-                            <Form.Item wrapperCol={{ offset: 4 }}>
-                                <Button type="primary" htmlType="submit">保存</Button>
-                                <Button type="dashed" htmlType="reset">重置</Button>
-                            </Form.Item>
-                        </Form></Col>
-                        <Col span={14}><JSONSchemaForm schema={schema}></JSONSchemaForm></Col>
+                            <ProFormText disabled={editStatus === "update"} name={"key"} required label={columnKey.title} tooltip={columnKey.description}
+                                rules={[{ required: true, message: "请输入结构标识" }, { pattern: /^\w+$/, message: '仅支持数字、字母及下划线' }]} />
+                            <ProFormText name="title" required label={columnTitle.title} tooltip={columnTitle.description}
+                                rules={[{ required: true, message: "请输入结构名称" }]} />
+                            <ProFormTextArea name="description" label={columnDescription.title} tooltip={columnDescription.description} />
+                            <ProFormSwitch name="secret" valuePropName="checked" label={columnSecret.title} tooltip={columnSecret.description}
+                                checkedChildren={<CheckOutlined />} unCheckedChildren={<CloseOutlined />} />
+
+                            <ProFormSwitch name="array" valuePropName="checked" label={columnArray.title} tooltip={columnArray.description}
+                                checkedChildren={<CheckOutlined />} unCheckedChildren={<CloseOutlined />} />
+                            <ProFormTextArea name="schema" label="结构" tooltip='json-schema格式数据' fieldProps={{ autoSize: true }} required />
+                        </ProForm></Col>
+                        <Col span={14}><JSONSchemaForm editStatus={"insert"} schema={schema} /></Col>
                     </Row>
                 </TabPane>
                 <TabPane tab="结构数据维护" key="structDataManager">

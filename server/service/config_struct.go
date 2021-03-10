@@ -16,7 +16,7 @@ type ConfigStruct struct {
 }
 
 func newCollection() *mongo.Collection {
-	return repository.DB.Collection("struct_config")
+	return repository.DB.Collection("config_struct")
 }
 
 var structConfigService = ConfigStruct{}

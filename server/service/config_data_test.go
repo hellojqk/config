@@ -22,7 +22,7 @@ func TestConfigData_FindOne(t *testing.T) {
 }
 
 func TestConfigData_Find(t *testing.T) {
-	total, result, err := structDataService.Find(context.Background(), "aa", entity.ListPagingParam{PageNum: 1, PageSize: 10, Filter: bson.M{}, Sort: bson.M{}})
+	total, result, err := structDataService.Find(context.Background(), "form", entity.ListPagingParam{PageNum: 1, PageSize: 10, Filter: bson.M{}, Sort: bson.M{}})
 	assert.Equal(t, nil, err)
 	t.Logf("%d\n%v\n", total, result)
 }

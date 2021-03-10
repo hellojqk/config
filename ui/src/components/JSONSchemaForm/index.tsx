@@ -10,6 +10,7 @@ import ProForm, { ProFormDigit, ProFormGroup, ProFormList, ProFormSwitch, ProFor
 const formItemLayout = { labelCol: { span: 4 }, wrapperCol: { span: 20 } }
 
 type JSONSchemaFormProps = {
+    editStatus: "insert" | "update" | undefined;
     schema: JSONSchema7;
     onSave?: (values: any) => void,
     values?: any
@@ -77,7 +78,7 @@ const JSONSchemaFormObject: React.FC<JSONSchemaFormObjectProps> = (props) => {
 const JSONSchemaForm: React.FC<JSONSchemaFormProps> = (props) => {
     const [form] = Form.useForm();
 
-    const { schema, onSave, values } = props;
+    const { schema, onSave, values, editStatus } = props;
 
     useEffect(() => {
         form.setFieldsValue(values);
@@ -101,10 +102,9 @@ const JSONSchemaForm: React.FC<JSONSchemaFormProps> = (props) => {
                 onFinish={onFinish}
                 onValuesChange={onValuesChange}
             >
+                <ProFormText disabled={editStatus == "update"} name={"key"} required label={"唯一标识"} tooltip={"将作为配置数据存储和获取的唯一标识，供程序识别"}
+                    rules={[{ required: true, message: "请输入结构标识" }, { pattern: /^\w+$/, message: '仅支持数字、字母及下划线' }]} />
                 <JSONSchemaFormObject fieldKey={[]} schema={schema} ></JSONSchemaFormObject>
-                <Form.Item wrapperCol={{ offset: 4 }}>
-                    <Button type="primary" htmlType="submit">保存</Button>
-                </Form.Item>
             </ProForm>
         </>
     );

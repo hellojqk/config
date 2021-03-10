@@ -1,6 +1,6 @@
 import { PageContainer } from '@ant-design/pro-layout';
 import React, { useState, useEffect, ReactNode } from 'react';
-import { message, Spin } from 'antd';
+import { Button, message, Spin } from 'antd';
 import styles from './index.less';
 import JSONSchemaForm from '@/components/JSONSchemaForm';
 import type { JSONSchema7, JSONSchema7Object } from 'json-schema';
@@ -20,6 +20,8 @@ const DataEditor: React.FC<DataEditorProps> = (props) => {
 
     const [structDataColumns, setStructDataColumns] = useState<any[]>([])
 
+    const [addFormStatus, setAddFormStatus] = useState("")
+
     useEffect(() => {
         console.log("useEffect", structKey)
         if (!structKey) {
@@ -29,9 +31,9 @@ const DataEditor: React.FC<DataEditorProps> = (props) => {
         setStructDataInfo({})
         findOneStruct(structKey).then(result => {
             setStructInfo(result)
-
-            if (result.array) {
-                const dataSchema = JSON.stringify(result.schema) as JSONSchema7;
+            debugger
+            if (result.array && result.schema) {
+                const dataSchema = JSON.parse(result.schema) as JSONSchema7;
                 let columns: any[] = []
                 if (!dataSchema.properties) {
                     return
@@ -43,26 +45,34 @@ const DataEditor: React.FC<DataEditorProps> = (props) => {
                     }
                     const column = {
                         title: fieldSchema.title,
-                        dataIndex: fieldKey,
-                        key: fieldKey,
+                        dataIndex: `.data.${fieldKey}`,
+                        key: `${fieldKey}`,
                         description: fieldSchema.description,
                         tooltip: fieldSchema.description,
                     }
                     columns.push(column)
                 })
+                console.log("setStructDataColumns", columns)
                 setStructDataColumns(columns)
+            } else {
+                findOneData(structKey, structKey).then(result => {
+                    setStructDataInfo(result)
+                })
             }
         })
 
-        findOneData(structKey, structKey).then(result => {
-            setStructDataInfo(result)
-        })
+
     }, [structKey]);
 
     const onSave = (values: any) => {
         console.log("onSave", values)
+        debugger
         if (!structKey) {
             return
+        }
+        let key = values.key;
+        if (!key) {
+            key = structDataInfo?.key;
         }
         if (!structDataInfo?.key) {
             insertData(structKey, { key: structKey, data: values }).then(result => {
@@ -78,10 +88,16 @@ const DataEditor: React.FC<DataEditorProps> = (props) => {
         <>
             <div>{structInfo?.title}数据管理</div>
             {structInfo && structInfo.schema && <>
-                {!structInfo.array ? <JSONSchemaForm values={structDataInfo?.data} onSave={onSave} schema={JSON.parse(structInfo?.schema)}></JSONSchemaForm> :
+                {!structInfo.array ? <JSONSchemaForm editStatus={"update"} values={{ ...structDataInfo?.data, key: structInfo.key }} onSave={onSave} schema={JSON.parse(structInfo?.schema)}></JSONSchemaForm> :
                     <ProTable size='small' columns={structDataColumns}
+                        toolBarRender={
+                            () => [<Button type="primary" size='small' onClick={() => {
+                                setAddFormStatus("true")
+                            }}>新增</Button>]
+                        }
                         request={(params) => (findData(structKey, { page_num: params.current, page_size: params.pageSize }))}
                     ></ProTable>}
+                {addFormStatus && <JSONSchemaForm editStatus={"insert"} onSave={onSave} schema={JSON.parse(structInfo?.schema)} />}
             </>}
         </>
     );

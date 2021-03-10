@@ -29,10 +29,9 @@ func getDataCollection(ctx context.Context, structKey string) (config *entity.Co
 		return nil, nil, errors.New("config key not exists")
 	}
 	if !config.Array {
-		collection = repository.DB.Collection("struct_data")
-
+		collection = repository.DB.Collection("config_data")
 	} else {
-		collection = repository.DB.Collection(fmt.Sprintf("ConfigData_%s", structKey))
+		collection = repository.DB.Collection(fmt.Sprintf("config_data_%s", structKey))
 	}
 	return
 }
@@ -70,7 +69,7 @@ func (s *ConfigData) FindOne(ctx context.Context, structKey string, dataKey stri
 }
 
 // Find .
-func (s *ConfigData) Find(ctx context.Context, structKey string, param entity.ListPagingParam) (total int64, result []entity.ConfigStruct, err error) {
+func (s *ConfigData) Find(ctx context.Context, structKey string, param entity.ListPagingParam) (total int64, result []entity.ConfigData, err error) {
 	if param.Filter == nil {
 		param.Filter = bson.M{}
 	}
@@ -99,7 +98,7 @@ func (s *ConfigData) Find(ctx context.Context, structKey string, param entity.Li
 	}
 
 	for cur.Next(ctx) {
-		model := entity.ConfigStruct{}
+		model := entity.ConfigData{}
 		err := cur.Decode(&model)
 		if err != nil {
 			continue
@@ -107,7 +106,7 @@ func (s *ConfigData) Find(ctx context.Context, structKey string, param entity.Li
 		result = append(result, model)
 	}
 
-	return 0, result, nil
+	return total, result, nil
 }
 
 // UpdateOne .

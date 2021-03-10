@@ -49,7 +49,7 @@ func InitConn() {
 
 	collectionNames, err := DB.ListCollectionNames(context.Background(), bsonx.Doc{})
 
-	var initCollections = []string{"struct_config", "struct_data"}
+	var initCollections = []string{"config_struct", "config_data"}
 	option := options.CreateCollection()
 	fmt.Printf("%v\n", collectionNames)
 	for _, collection := range initCollections {
