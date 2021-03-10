@@ -18,7 +18,7 @@ import type { JSONSchema7 } from 'json-schema';
 import { CheckOutlined, CloseOutlined, MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import { insertStruct, findStruct, updateStruct } from '@/services/config/struct';
 import type config from 'config/config';
-import JsonSchemaForm from '@/components/JsonSchemaFrom';
+import JsonSchemaForm from '@/components/JSONSchemaFrom';
 import type { ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import moment from 'moment';
@@ -163,10 +163,10 @@ export default () => {
     return (
         <PageContainer title={false} className={styles.main}>
             <Tabs defaultActiveKey="1" activeKey={activeKey} onTabClick={(key) => { setActiveKey(key) }}>
-                <TabPane tab="查看" key="list">
+                <TabPane tab="结构列表" key="list">
                     <ProTable size='small' columns={columns} request={(params) => (findStruct({ page_num: params.current, page_size: params.pageSize }))}></ProTable>
                 </TabPane>
-                <TabPane tab="结构编辑" key="edit">
+                <TabPane tab="结构新增" key="edit">
                     <Row>
                         <Col span={10}><Form
                             form={form}

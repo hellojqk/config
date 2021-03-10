@@ -3,10 +3,11 @@ import React, { useEffect } from 'react';
 import type { JSONSchema7, JSONSchema7Object } from 'json-schema';
 
 import styles from './index.less';
-import { Button, Form, Input, InputNumber, Radio, Switch } from 'antd';
+import { Button, Card, Form, Input, InputNumber, Radio, Switch } from 'antd';
 import { CheckOutlined, CloseOutlined, MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import ProForm, { ProFormDigit, ProFormGroup, ProFormList, ProFormSwitch, ProFormText } from '@ant-design/pro-form';
 
-const formItemLayout = { labelCol: { span: 4 }, wrapperCol: { span: 18 } }
+const formItemLayout = { labelCol: { span: 4 }, wrapperCol: { span: 20 } }
 
 const formItemLayoutWithOutLabel = {
     wrapperCol: {
@@ -21,38 +22,7 @@ type JsonSchemaFormProps = {
     values?: any
 }
 
-// const JsonSchemaFormItemArray: React.FC<JsonSchemaFormProps> = (props) => {
-//     const { propKey, schema } = props;
-//     return <>
-//         <Form.Item  {...formItemLayout} name={propKey} fieldKey={propKey} label={schema?.title} tooltip={schema?.description} initialValue={schema?.default} required={schema.required?.includes(propKey)} key={propKey}>
-//             {!(schema.items instanceof Array) &&
-//                 <Form.List name={propKey}>
-//                     {(fields, { add, remove }, { errors }) => (
-//                         <>
-//                             {fields.map((field, index) => (
-//                                 <Form.Item {...formItemLayoutWithOutLabel} required={false}>
-//                                     {schema.items && (schema.items as JSONSchema7).type === 'string' && <JsonSchemaFormItemString propKey={propKey} schema={schema.items as JSONSchema7} />}
-//                                     {schema.items && (schema.items as JSONSchema7).type === 'boolean' && <JsonSchemaFormItemBoolean propKey={propKey} schema={schema.items as JSONSchema7} />}
-//                                     {schema.items && (schema.items as JSONSchema7).type === 'integer' && <JsonSchemaFormItemInteger propKey={propKey} schema={schema.items as JSONSchema7} />}
-//                                     {schema.items && (schema.items as JSONSchema7).type === 'number' && <JsonSchemaFormItemNumber propKey={propKey} schema={schema.items as JSONSchema7} />}
-//                                     {/* {schema.items && (schema.items as JSONSchema7).type === 'object' && <JsonSchemaFormItemObject propKey={propKey} schema={schema.items as JSONSchema7} />} */}
-//                                     {fields.length > 1 ? (<MinusCircleOutlined className="dynamic-delete-button" onClick={() => remove(field.name)} />
-//                                     ) : null}
-//                                 </Form.Item>
-//                             ))}
-//                             <Form.Item {...formItemLayoutWithOutLabel}>
-//                                 <Button type="dashed" onClick={() => add()} style={{ width: '60%' }} icon={<PlusOutlined />}>添加</Button>
-//                                 <Form.ErrorList errors={errors} />
-//                             </Form.Item>
-//                         </>
-//                     )}
-//                 </Form.List>
-//             }
-//         </Form.Item>
-//     </>
-// }
-
-const JsonSchemaFormItemObject: React.FC<JsonSchemaFormProps> = (props) => {
+const JSONSchemeForm: React.FC<JsonSchemaFormProps> = (props) => {
     const { schema, fieldKey } = props;
     return <>
         {Object.keys(schema.properties || {}).map(childPropKey => {
@@ -60,102 +30,49 @@ const JsonSchemaFormItemObject: React.FC<JsonSchemaFormProps> = (props) => {
             if (!childPropSchema) {
                 return <></>
             }
+            // console.log(JSON.stringify(childPropSchema))
             switch (childPropSchema.type) {
                 case "string":
-                    return <Form.Item {...formItemLayout} name={[...fieldKey, childPropKey]} label={childPropSchema?.title} tooltip={childPropSchema?.description} initialValue={childPropSchema?.default} required={schema.required?.includes(childPropKey)} >
-                        <Input min={childPropSchema?.minLength} max={childPropSchema?.maxLength} />
-                    </Form.Item>
+                    return <ProFormText fieldProps={{ min: childPropSchema?.minLength, max: childPropSchema?.maxLength }} {...formItemLayout} name={[...fieldKey, childPropKey]} label={childPropSchema?.title} tooltip={childPropSchema?.description} initialValue={childPropSchema?.default} required={schema.required?.includes(childPropKey)} />
                 case "integer":
-                    return <Form.Item {...formItemLayout} name={[...fieldKey, childPropKey]} label={childPropSchema?.title} tooltip={childPropSchema?.description} initialValue={childPropSchema?.default} required={schema.required?.includes(childPropKey)} >
-                        <InputNumber min={childPropSchema?.minimum} max={childPropSchema?.maximum} />
-                    </Form.Item>
+                    return <ProFormDigit fieldProps={{ precision: 0 }} min={childPropSchema?.minimum} max={childPropSchema?.maximum} {...formItemLayout} name={[...fieldKey, childPropKey]} label={childPropSchema?.title} tooltip={childPropSchema?.description} initialValue={childPropSchema?.default} required={schema.required?.includes(childPropKey)} />
                 case "number":
-                    return <Form.Item {...formItemLayout} name={[...fieldKey, childPropKey]} label={childPropSchema?.title} tooltip={childPropSchema?.description} initialValue={childPropSchema?.default} required={schema.required?.includes(childPropKey)} >
-                        <InputNumber min={childPropSchema?.minimum} max={childPropSchema?.maximum} />
-                    </Form.Item>
+                    return <ProFormDigit min={childPropSchema?.minimum} max={childPropSchema?.maximum} {...formItemLayout} name={[...fieldKey, childPropKey]} label={childPropSchema?.title} tooltip={childPropSchema?.description} initialValue={childPropSchema?.default} required={schema.required?.includes(childPropKey)} />
                 case "boolean":
-                    return <Form.Item {...formItemLayout} name={[...fieldKey, childPropKey]} label={childPropSchema?.title} tooltip={childPropSchema?.description} initialValue={childPropSchema?.default} required={schema.required?.includes(childPropKey)} >
-                        <Switch checkedChildren={<CheckOutlined />} unCheckedChildren={<CloseOutlined />} />
-                    </Form.Item>
+                    return <ProFormSwitch checkedChildren={<CheckOutlined />} unCheckedChildren={<CloseOutlined />} {...formItemLayout} name={[...fieldKey, childPropKey]} label={childPropSchema?.title} tooltip={childPropSchema?.description} initialValue={childPropSchema?.default} required={schema.required?.includes(childPropKey)} />
                 case "object":
                     return <Form.Item {...formItemLayout} label={childPropSchema?.title} tooltip={childPropSchema?.description} initialValue={childPropSchema?.default} required={schema.required?.includes(childPropKey)} >
                         {/* {JSON.stringify([...fieldKey, childPropKey])} */}
-                        <JsonSchemaFormItemObject fieldKey={[...fieldKey, childPropKey]} schema={childPropSchema} />
+                        <JSONSchemeForm fieldKey={[...fieldKey, childPropKey]} schema={childPropSchema} />
                     </Form.Item>
                 case "array":
-                    return <Form.Item {...formItemLayout} label={childPropSchema?.title} tooltip={childPropSchema?.description} initialValue={childPropSchema?.default} required={schema.required?.includes(childPropKey)} >
-                        {/* {JSON.stringify(childPropSchema)} */}
-                        {childPropSchema.items &&
-                            <Form.List name={[...fieldKey, childPropKey]}>
-                                {(fields, { add, remove }, { errors }) => (
-                                    <>
-                                        {fields.map((field) => {
-                                            const fieldSchema = childPropSchema.items as JSONSchema7
-                                            switch (fieldSchema.type) {
-                                                case "string":
-                                                    return <Form.Item required={false} key={field.key}>
-                                                        <Form.Item {...field} style={{ width: "50%" }}>
-                                                            <Input min={childPropSchema?.minLength} max={childPropSchema?.maxLength} />
-                                                        </Form.Item>
-                                                        {fields.length > 1 ? (<MinusCircleOutlined className={styles['dynamic-delete-button']} onClick={() => remove(field.name)} />) : null}
-                                                    </Form.Item>
-                                                case "integer":
-                                                    return <Form.Item required={false} key={field.key}>
-                                                        <Form.Item {...field} style={{ width: "50%" }}>
-                                                            <InputNumber min={fieldSchema?.minimum} max={fieldSchema?.maximum} />
-                                                        </Form.Item>
-                                                        {fields.length > 1 ? (<MinusCircleOutlined className={styles['dynamic-delete-button']} onClick={() => remove(field.name)} />) : null}
-                                                    </Form.Item>
-                                                case "number":
-                                                    return <Form.Item required={false} key={field.key}>
-                                                        <Form.Item {...field} style={{ width: "50%" }}>
-                                                            <InputNumber min={fieldSchema?.minimum} max={fieldSchema?.maximum} />
-                                                        </Form.Item>
-                                                        {fields.length > 1 ? (<MinusCircleOutlined className={styles['dynamic-delete-button']} onClick={() => remove(field.name)} />) : null}
-                                                    </Form.Item>
-                                                case "boolean":
-                                                    return <Form.Item required={false} key={field.key}>
-                                                        <Form.Item {...field} style={{ width: "50%" }}>
-                                                            <Switch checkedChildren={<CheckOutlined />} unCheckedChildren={<CloseOutlined />} />
-                                                        </Form.Item>
-                                                        {fields.length > 1 ? (<MinusCircleOutlined className={styles['dynamic-delete-button']} onClick={() => remove(field.name)} />) : null}
-                                                    </Form.Item>
-                                                case "object":
-                                                    return <Form.Item required={false} key={field.key}>
-                                                        <JsonSchemaFormItemObject fieldKey={[field.fieldKey]} schema={fieldSchema} />
-                                                        {fields.length > 1 ? (<MinusCircleOutlined className={styles['dynamic-delete-button']} onClick={() => remove(field.name)} />) : null}
-                                                    </Form.Item>
-                                                default:
-                                                    return <></>
-                                            }
-                                            // return <Form.Item required={false} key={field.key}>
-                                            //     {JSON.stringify(childPropSchema.items)}
-                                            //     <JsonSchemaFormItemObject fieldKey={[field.fieldKey]} schema={childPropSchema.items as JSONSchema7} />
-                                            //     {/* <Form.Item {...field} style={{ width: "50%" }}>
-                                            //     <Input />
-                                            // </Form.Item> */}
-                                            //     {fields.length > 1 ? (
-                                            //         <MinusCircleOutlined
-                                            //             className={styles['dynamic-delete-button']}
-                                            //             onClick={() => remove(field.name)}
-                                            //         />
-                                            //     ) : null}
-                                            // </Form.Item>
-                                        })}
-                                        <Form.Item>
-                                            <Button type="dashed" onClick={() => add()} style={{ width: '60%' }} icon={<PlusOutlined />}>添加</Button>
-                                            <Form.ErrorList errors={errors} />
-                                        </Form.Item>
-                                    </>
-                                )}
-                            </Form.List>
-                        }
-                    </Form.Item>
+                    const arrayFieldSchema = childPropSchema.items as JSONSchema7
+                    let childComps;
+                    switch (arrayFieldSchema.type) {
+                        case "string":
+                            childComps = <ProFormText fieldProps={{ min: arrayFieldSchema?.minLength, max: arrayFieldSchema?.maxLength }} {...formItemLayout} name={[]} label={arrayFieldSchema?.title} tooltip={arrayFieldSchema?.description} initialValue={arrayFieldSchema?.default} required={schema.required?.includes(childPropKey)} />
+                            break
+                        case "integer":
+                            childComps = <ProFormDigit fieldProps={{ precision: 0 }} min={arrayFieldSchema?.minimum} max={arrayFieldSchema?.maximum} {...formItemLayout} name={[]} label={arrayFieldSchema?.title} tooltip={arrayFieldSchema?.description} initialValue={arrayFieldSchema?.default} required={schema.required?.includes(childPropKey)} />
+                            break
+                        case "number":
+                            childComps = <ProFormDigit min={arrayFieldSchema?.minimum} max={arrayFieldSchema?.maximum} {...formItemLayout} name={[]} label={arrayFieldSchema?.title} tooltip={arrayFieldSchema?.description} initialValue={arrayFieldSchema?.default} required={schema.required?.includes(childPropKey)} />
+                            break
+                        case "boolean":
+                            childComps = <ProFormSwitch checkedChildren={<CheckOutlined />} unCheckedChildren={<CloseOutlined />} {...formItemLayout} name={[]} label={arrayFieldSchema?.title} tooltip={arrayFieldSchema?.description} initialValue={arrayFieldSchema?.default} required={schema.required?.includes(childPropKey)} />
+                            break
+                        case "object":
+                            // console.log(JSON.stringify(arrayFieldSchema))
+                            childComps = <ProFormGroup style={{ width: "200%" }}><JSONSchemeForm fieldKey={[...fieldKey]} schema={arrayFieldSchema} /></ProFormGroup>
+                            break
+                        default:
+                            return <></>
+                    }
+                    return <ProFormList name={[...fieldKey, childPropKey]} label={childPropSchema?.title} tooltip={childPropSchema?.description}>
+                        {childComps}
+                    </ProFormList>
                 default:
                     return <></>
-                // return <Form.Item {...formItemLayout} name={childPropKey} label={childPropSchema?.title} tooltip={childPropSchema?.description} initialValue={childPropSchema?.default} required={schema.required?.includes(childPropKey)} >
-                //     <Input />
-                // </Form.Item>
             }
         })}
     </>
@@ -182,16 +99,17 @@ const JsonSchemaForm: React.FC<JsonSchemaFormProps> = (props) => {
 
     return (
         <>
-            <Form {...formItemLayout}
+            <ProForm {...formItemLayout}
+                layout='horizontal'
                 form={form}
                 onFinish={onFinish}
                 onValuesChange={onValuesChange}
             >
-                <JsonSchemaFormItemObject fieldKey={[]} schema={schema} ></JsonSchemaFormItemObject>
+                <JSONSchemeForm fieldKey={[]} schema={schema} ></JSONSchemeForm>
                 <Form.Item wrapperCol={{ offset: 4 }}>
                     <Button type="primary" htmlType="submit">保存</Button>
                 </Form.Item>
-            </Form>
+            </ProForm>
         </>
     );
 };
