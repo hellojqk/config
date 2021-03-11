@@ -39,13 +39,17 @@ func getDataCollection(ctx context.Context, structKey string) (config *entity.Co
 // InsertOne .
 func (s *ConfigData) InsertOne(ctx context.Context, structKey string, model entity.ConfigData) (result interface{}, err error) {
 
-	_, collection, err := getDataCollection(ctx, structKey)
+	config, collection, err := getDataCollection(ctx, structKey)
 	if err != nil {
 		return nil, err
 	}
 
-	model.Create(0)
-	insertResult, err := collection.InsertOne(ctx, bson.M{"key": model.Key, "data": model.Data})
+	model.SetCreator(0)
+	//如果是结构配置的是数组结构，强制model中的key为structKey
+	if config.Array {
+		model["key"] = structKey
+	}
+	insertResult, err := collection.InsertOne(ctx, model)
 
 	if err != nil {
 		return nil, err
@@ -74,7 +78,7 @@ func (s *ConfigData) Find(ctx context.Context, structKey string, param entity.Li
 		param.Filter = bson.M{}
 	}
 	if param.Sort == nil {
-		param.Sort = bson.M{}
+		param.Sort = bson.M{"creator.timestamp": -1}
 	}
 
 	util.PrintJSON("ConfigData Find", param)
@@ -111,16 +115,12 @@ func (s *ConfigData) Find(ctx context.Context, structKey string, param entity.Li
 
 // UpdateOne .
 func (s *ConfigData) UpdateOne(ctx context.Context, key string, model entity.ConfigData) (result interface{}, err error) {
-	model.Update(0)
 	_, collection, err := getDataCollection(ctx, key)
 	if err != nil {
 		return nil, err
 	}
-	updateResult, err := collection.UpdateOne(ctx, bson.M{"key": key}, bson.M{"$set": bson.M{
-		"data":           model.Data,
-		"update_time":    model.UpdateTime,
-		"update_user_id": model.UpdateUserID,
-	}})
+	model.SetUpdater(0)
+	updateResult, err := collection.UpdateOne(ctx, bson.M{"key": key}, bson.M{"$set": model})
 	if err != nil {
 		return nil, err
 	}

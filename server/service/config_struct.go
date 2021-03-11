@@ -23,7 +23,7 @@ var structConfigService = ConfigStruct{}
 
 // InsertOne .
 func (s *ConfigStruct) InsertOne(ctx context.Context, model entity.ConfigStruct) (result interface{}, err error) {
-	model.Create(0)
+	model.SetCreator(0)
 	insertResult, err := newCollection().InsertOne(ctx, model)
 	if err != nil {
 		return nil, err
@@ -48,7 +48,7 @@ func (s *ConfigStruct) Find(ctx context.Context, param entity.ListPagingParam) (
 		param.Filter = bson.M{}
 	}
 	if param.Sort == nil {
-		param.Sort = bson.M{}
+		param.Sort = bson.M{"creator.timestamp": -1}
 	}
 	util.PrintJSON("ConfigStruct Find", param)
 	total, err = newCollection().CountDocuments(ctx, param.Filter)
@@ -78,15 +78,14 @@ func (s *ConfigStruct) Find(ctx context.Context, param entity.ListPagingParam) (
 
 // UpdateOne .
 func (s *ConfigStruct) UpdateOne(ctx context.Context, structKey string, model entity.ConfigStruct) (result interface{}, err error) {
-	model.Update(0)
+	model.SetUpdater(0)
 	updateResult, err := newCollection().UpdateOne(ctx, bson.M{"key": structKey}, bson.M{"$set": bson.M{
-		"title":          model.Title,
-		"description":    model.Description,
-		"secret":         model.Secret,
-		"array":          model.Array,
-		"schema":         model.Schema,
-		"update_time":    model.UpdateTime,
-		"update_user_id": model.UpdateUserID,
+		"title":       model.Title,
+		"description": model.Description,
+		"secret":      model.Secret,
+		"array":       model.Array,
+		"schema":      model.Schema,
+		"updater":     model.Updater,
 	}})
 	if err != nil {
 		return nil, err

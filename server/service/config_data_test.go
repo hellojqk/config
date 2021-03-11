@@ -10,7 +10,7 @@ import (
 )
 
 func TestConfigData_InsertOne(t *testing.T) {
-	result, err := structDataService.InsertOne(context.Background(), "key1", entity.ConfigData{Key: "key1", Data: bson.M{"key": "key1", "qty": 100}})
+	result, err := structDataService.InsertOne(context.Background(), "key2", entity.ConfigData{"key": "key2", "qty": 100})
 	assert.Equal(t, nil, err)
 	t.Logf("%v\n", result)
 }

@@ -47,7 +47,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestConfigStruct_InsertOne(t *testing.T) {
-	result, err := structConfigService.InsertOne(context.Background(), entity.ConfigStruct{Key: "key1"})
+	result, err := structConfigService.InsertOne(context.Background(), entity.ConfigStruct{Key: "key11"})
 	result, err = structConfigService.InsertOne(context.Background(), entity.ConfigStruct{Key: "key2"})
 	result, err = structConfigService.InsertOne(context.Background(), entity.ConfigStruct{Key: "key3"})
 	result, err = structConfigService.InsertOne(context.Background(), entity.ConfigStruct{Key: "key4"})
@@ -64,13 +64,21 @@ func TestConfigStruct_FindOne(t *testing.T) {
 }
 
 func TestConfigStruct_Find(t *testing.T) {
-	total, result, err := structConfigService.Find(context.Background(), entity.ListPagingParam{PageNum: 1, PageSize: 10, Filter: bson.M{"key": bson.M{"$regex": "key"}}, Sort: bson.M{"key": -1}})
+	total, result, err := structConfigService.Find(context.Background(), entity.ListPagingParam{PageNum: 1, PageSize: 10, Filter: bson.M{"key": bson.M{"$regex": "key"}}})
 	assert.Equal(t, nil, err)
 	t.Logf("%d\n%v\n", total, result)
 }
 
 func TestConfigStruct_UpdateOne(t *testing.T) {
-	result, err := structConfigService.UpdateOne(context.Background(), "key", entity.ConfigStruct{Title: "title"})
+	result, err := structConfigService.UpdateOne(context.Background(), "key11", entity.ConfigStruct{Title: "title"})
+	assert.Equal(t, nil, err)
+	t.Logf("%v\n", result)
+}
+
+func TestConfigStruct_Edit(t *testing.T) {
+	result, err := structConfigService.InsertOne(context.Background(), entity.ConfigStruct{Key: "key111"})
+
+	result, err = structConfigService.UpdateOne(context.Background(), "key111", entity.ConfigStruct{Title: "title"})
 	assert.Equal(t, nil, err)
 	t.Logf("%v\n", result)
 }

@@ -10,24 +10,28 @@ type ListPagingParam struct {
 	Sort     interface{} `json:"sort" form:"sort" query:"sort"`
 }
 
-// Base .
-type Base struct {
-	CreateUserID int64 `json:"create_user_id"`
-	CreateTime   int64 `json:"create_time"`
-	UpdateUserID int64 `json:"update_user_id"`
-	UpdateTime   int64 `json:"update_time"`
+// Creator .
+type Creator struct {
+	ID        int64 `bson:"id,omitempty" json:"id"`
+	Timestamp int64 `bson:"timestamp,omitempty" json:"timestamp"`
+}
+
+// Set .
+func (m *Creator) Set(id int64, timestamp int64) {
+	m.ID = id
+	m.Timestamp = timestamp
+}
+
+// Updater .
+type Updater struct {
+	ID        int64 `bson:"id,omitempty" json:"id"`
+	Timestamp int64 `bson:"timestamp,omitempty" json:"timestamp"`
 }
 
 var millisecond = int64(time.Millisecond)
 
-// Create .
-func (b *Base) Create(userID int64) {
-	b.CreateUserID = userID
-	b.CreateTime = time.Now().UnixNano() / millisecond
-}
-
-// Update .
-func (b *Base) Update(userID int64) {
-	b.UpdateTime = userID
-	b.UpdateTime = time.Now().UnixNano() / millisecond
+// Set .
+func (m *Updater) Set(id int64, timestamp int64) {
+	m.ID = id
+	m.Timestamp = timestamp
 }
