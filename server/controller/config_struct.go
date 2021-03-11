@@ -31,13 +31,16 @@ func (s *ConfigStruct) Insert(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, result)
+	if !result {
+		c.JSON(http.StatusBadRequest, gin.H{"err": "保存失败"})
+	}
+	c.Status(http.StatusOK)
 }
 
 // UpdateOne .
 func (s *ConfigStruct) UpdateOne(c *gin.Context) {
-	var m model.URI
-	if err := c.ShouldBindUri(&m); err != nil {
+	var uriModel model.URI
+	if err := c.ShouldBindUri(&uriModel); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 		return
 	}
@@ -48,23 +51,26 @@ func (s *ConfigStruct) UpdateOne(c *gin.Context) {
 		return
 	}
 
-	result, err := structConfigService.UpdateOne(context.Background(), m.StructKey, model)
+	result, err := structConfigService.UpdateOne(context.Background(), uriModel.StructKey, model)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, result)
+	if !result {
+		c.JSON(http.StatusBadRequest, gin.H{"err": "保存失败"})
+	}
+	c.Status(http.StatusOK)
 }
 
 // FindOne .
 func (s *ConfigStruct) FindOne(c *gin.Context) {
-	var m model.URI
-	if err := c.ShouldBindUri(&m); err != nil {
+	var uriModel model.URI
+	if err := c.ShouldBindUri(&uriModel); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 		return
 	}
-	fmt.Printf("key:%s\n", m.StructKey)
-	result, err := structConfigService.FindOne(context.Background(), m.StructKey)
+	fmt.Printf("key:%s\n", uriModel.StructKey)
+	result, err := structConfigService.FindOne(context.Background(), uriModel.StructKey)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 		return

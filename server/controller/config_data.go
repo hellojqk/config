@@ -21,8 +21,8 @@ var structDataService = service.ConfigData{}
 // Insert .
 func (s *ConfigData) Insert(c *gin.Context) {
 
-	var m model.URI
-	if err := c.ShouldBindUri(&m); err != nil {
+	var uriModel model.URI
+	if err := c.ShouldBindUri(&uriModel); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 		return
 	}
@@ -33,18 +33,21 @@ func (s *ConfigData) Insert(c *gin.Context) {
 		return
 	}
 
-	result, err := structDataService.InsertOne(context.Background(), m.StructKey, model)
+	result, err := structDataService.InsertOne(context.Background(), uriModel.StructKey, model)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, result)
+	if !result {
+		c.JSON(http.StatusBadRequest, gin.H{"err": "保存失败"})
+	}
+	c.Status(http.StatusOK)
 }
 
 // UpdateOne .
 func (s *ConfigData) UpdateOne(c *gin.Context) {
-	var m model.URI
-	if err := c.ShouldBindUri(&m); err != nil {
+	var uriModel model.URI
+	if err := c.ShouldBindUri(&uriModel); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 		return
 	}
@@ -55,23 +58,26 @@ func (s *ConfigData) UpdateOne(c *gin.Context) {
 		return
 	}
 
-	result, err := structDataService.UpdateOne(context.Background(), m.StructKey, model)
+	result, err := structDataService.UpdateOne(context.Background(), uriModel.StructKey, model)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, result)
+	if !result {
+		c.JSON(http.StatusBadRequest, gin.H{"err": "保存失败"})
+	}
+	c.Status(http.StatusOK)
 }
 
 // FindOne .
 func (s *ConfigData) FindOne(c *gin.Context) {
-	var m model.URI
-	if err := c.ShouldBindUri(&m); err != nil {
+	var uriModel model.URI
+	if err := c.ShouldBindUri(&uriModel); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 		return
 	}
-	fmt.Printf("key:%s\t%s\n", m.StructKey, m.DataKey)
-	result, err := structDataService.FindOne(context.Background(), m.StructKey, m.DataKey)
+	fmt.Printf("key:%s\t%s\n", uriModel.StructKey, uriModel.DataKey)
+	result, err := structDataService.FindOne(context.Background(), uriModel.StructKey, uriModel.DataKey)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 		return
@@ -82,8 +88,8 @@ func (s *ConfigData) FindOne(c *gin.Context) {
 // Find .
 // /api/struct?page_num=1&page_size=10
 func (s *ConfigData) Find(c *gin.Context) {
-	var m model.URI
-	if err := c.ShouldBindUri(&m); err != nil {
+	var uriModel model.URI
+	if err := c.ShouldBindUri(&uriModel); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 		return
 	}
@@ -95,7 +101,7 @@ func (s *ConfigData) Find(c *gin.Context) {
 	}
 	util.PrintJSON("ConfigData Find", param)
 
-	total, result, err := structDataService.Find(context.Background(), m.StructKey, param)
+	total, result, err := structDataService.Find(context.Background(), uriModel.StructKey, param)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 		return

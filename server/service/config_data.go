@@ -37,25 +37,25 @@ func getDataCollection(ctx context.Context, structKey string) (config *entity.Co
 }
 
 // InsertOne .
-func (s *ConfigData) InsertOne(ctx context.Context, structKey string, model entity.ConfigData) (result interface{}, err error) {
+func (s *ConfigData) InsertOne(ctx context.Context, structKey string, model entity.ConfigData) (result bool, err error) {
 
 	config, collection, err := getDataCollection(ctx, structKey)
 	if err != nil {
-		return nil, err
+		return false, err
 	}
 
 	model.SetCreator(0)
-	//如果是结构配置的是数组结构，强制model中的key为structKey
-	if config.Array {
+	//如果是结构配置的不是数组结构，强制model中的key为structKey
+	if !config.Array {
 		model["key"] = structKey
 	}
 	insertResult, err := collection.InsertOne(ctx, model)
 
 	if err != nil {
-		return nil, err
+		return false, err
 	}
 
-	return insertResult.InsertedID, nil
+	return insertResult.InsertedID != nil, nil
 }
 
 // FindOne .
@@ -114,16 +114,16 @@ func (s *ConfigData) Find(ctx context.Context, structKey string, param entity.Li
 }
 
 // UpdateOne .
-func (s *ConfigData) UpdateOne(ctx context.Context, key string, model entity.ConfigData) (result interface{}, err error) {
+func (s *ConfigData) UpdateOne(ctx context.Context, key string, model entity.ConfigData) (result bool, err error) {
 	_, collection, err := getDataCollection(ctx, key)
 	if err != nil {
-		return nil, err
+		return false, err
 	}
 	model.SetUpdater(0)
 	updateResult, err := collection.UpdateOne(ctx, bson.M{"key": key}, bson.M{"$set": model})
 	if err != nil {
-		return nil, err
+		return false, err
 	}
 
-	return updateResult.ModifiedCount, nil
+	return updateResult.ModifiedCount == 1, nil
 }

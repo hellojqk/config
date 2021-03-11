@@ -8,6 +8,13 @@ import { findOneStruct } from '@/services/config/struct';
 import { findData, findOneData, insertData, updateData } from '@/services/config/data';
 import ProTable from '@ant-design/pro-table';
 
+const columnKey = {
+    title: "唯一标识",
+    dataIndex: "key",
+    key: "key",
+    description: "将作为配置数据存储和获取的唯一标识，供程序识别",
+    tooltip: "将作为配置数据存储和获取的唯一标识，供程序识别"
+}
 
 type DataEditorProps = {
     structKey?: string
@@ -31,10 +38,9 @@ const DataEditor: React.FC<DataEditorProps> = (props) => {
         setStructDataInfo({})
         findOneStruct(structKey).then(result => {
             setStructInfo(result)
-            debugger
             if (result.array && result.schema) {
                 const dataSchema = JSON.parse(result.schema) as JSONSchema7;
-                let columns: any[] = []
+                let columns: any[] = [columnKey]
                 if (!dataSchema.properties) {
                     return
                 }
@@ -43,9 +49,12 @@ const DataEditor: React.FC<DataEditorProps> = (props) => {
                     if (!fieldSchema) {
                         return;
                     }
+                    if (fieldSchema.type == "object" || fieldSchema.type == "array" || !fieldSchema.type) {
+                        return;
+                    }
                     const column = {
                         title: fieldSchema.title,
-                        dataIndex: `.data.${fieldKey}`,
+                        dataIndex: `${fieldKey}`,
                         key: `${fieldKey}`,
                         description: fieldSchema.description,
                         tooltip: fieldSchema.description,
@@ -66,7 +75,6 @@ const DataEditor: React.FC<DataEditorProps> = (props) => {
 
     const onSave = (values: any) => {
         console.log("onSave", values)
-        debugger
         if (!structKey) {
             return
         }
@@ -75,12 +83,12 @@ const DataEditor: React.FC<DataEditorProps> = (props) => {
             key = structDataInfo?.key;
         }
         if (!structDataInfo?.key) {
-            insertData(structKey, { key: structKey, data: values }).then(result => {
-                message.info(result);
+            insertData(structKey, values).then(result => {
+                message.info("新增成功");
             })
         } else {
-            updateData(structKey, structDataInfo.key, { data: values }).then(result => {
-                message.info(result);
+            updateData(structKey, structDataInfo.key, values).then(result => {
+                message.info("更新成功");
             })
         }
     }
@@ -95,7 +103,20 @@ const DataEditor: React.FC<DataEditorProps> = (props) => {
                                 setAddFormStatus("true")
                             }}>新增</Button>]
                         }
-                        request={(params) => (findData(structKey, { page_num: params.current, page_size: params.pageSize }))}
+                        request={(params) => (findData(structKey, { page_num: params.current, page_size: params.pageSize }).then(result => {
+                            console.log("findData", result)
+                            result.data.map(item => {
+                                const keys = Object.keys(item)
+                                for (let i = 0; i < keys.length; i++) {
+                                    const key = keys[i];
+                                    if (item[key] instanceof Object || item[key] instanceof Array) {
+                                        item[key] = null
+                                    }
+                                }
+                                return item
+                            })
+                            return result
+                        }))}
                     ></ProTable>}
                 {addFormStatus && <JSONSchemaForm editStatus={"insert"} onSave={onSave} schema={JSON.parse(structInfo?.schema)} />}
             </>}

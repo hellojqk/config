@@ -22,14 +22,14 @@ func newCollection() *mongo.Collection {
 var structConfigService = ConfigStruct{}
 
 // InsertOne .
-func (s *ConfigStruct) InsertOne(ctx context.Context, model entity.ConfigStruct) (result interface{}, err error) {
+func (s *ConfigStruct) InsertOne(ctx context.Context, model entity.ConfigStruct) (result bool, err error) {
 	model.SetCreator(0)
 	insertResult, err := newCollection().InsertOne(ctx, model)
 	if err != nil {
-		return nil, err
+		return false, err
 	}
 
-	return insertResult.InsertedID, nil
+	return insertResult.InsertedID != nil, nil
 }
 
 // FindOne .
@@ -77,7 +77,7 @@ func (s *ConfigStruct) Find(ctx context.Context, param entity.ListPagingParam) (
 }
 
 // UpdateOne .
-func (s *ConfigStruct) UpdateOne(ctx context.Context, structKey string, model entity.ConfigStruct) (result interface{}, err error) {
+func (s *ConfigStruct) UpdateOne(ctx context.Context, structKey string, model entity.ConfigStruct) (result bool, err error) {
 	model.SetUpdater(0)
 	updateResult, err := newCollection().UpdateOne(ctx, bson.M{"key": structKey}, bson.M{"$set": bson.M{
 		"title":       model.Title,
@@ -88,8 +88,8 @@ func (s *ConfigStruct) UpdateOne(ctx context.Context, structKey string, model en
 		"updater":     model.Updater,
 	}})
 	if err != nil {
-		return nil, err
+		return false, err
 	}
 
-	return updateResult.ModifiedCount, nil
+	return updateResult.ModifiedCount == 1, nil
 }

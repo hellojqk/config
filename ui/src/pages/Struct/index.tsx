@@ -100,20 +100,22 @@ export default () => {
         columnSchema,
         {
             title: '创建时间',
-            dataIndex: "create_time",
-            key: 'create_time',
+            dataIndex: ["creator", "timestamp"],
+            key: 'creator.timestamp',
             hideInSearch: true,
             renderText: (text) => {
-                return moment(text).format('YYYY-MM-DD HH:mm:ss')
+                console.log("creator", text)
+                return moment(text).format('YYYY-MM-DD HH:mm:ss.SSS')
             }
         },
         {
             title: '修改时间',
-            dataIndex: "update_time",
-            key: 'update_time',
+            dataIndex: ["updater", "timestamp"],
+            key: 'updater.timestamp',
             hideInSearch: true,
             renderText: (text) => {
-                return moment(text).format('YYYY-MM-DD HH:mm:ss')
+                console.log("updater", text)
+                return moment(text).format('YYYY-MM-DD HH:mm:ss.SSS')
             }
         },
         {
@@ -149,12 +151,11 @@ export default () => {
         console.log('表单数据: ', values);
         if (editStatus == "update") {
             updateStruct(values.key as string, values).then(result => {
-                // console.log(result)
-                message.info(result);
+                message.info("更新成功");
             })
         } else {
             insertStruct(values).then(result => {
-                message.info(result);
+                message.info("创建成功");
             })
         }
     };
