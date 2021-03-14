@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/hellojqk/config/util"
 	"github.com/spf13/cobra"
 
 	homedir "github.com/mitchellh/go-homedir"
@@ -52,13 +53,13 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
+	cobra.OnInitialize(initConfig, util.WaitInitFuncsExec)
 
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.hpa.yaml or `pwd`/config/.hpa.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config.yaml or `pwd`/config/.config.yaml)")
 
 	//配置连接字符串
 	rootCmd.PersistentFlags().StringP("connectionString", "c", "", "数据库连接字符串")

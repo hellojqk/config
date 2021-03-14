@@ -23,8 +23,8 @@ import (
 // runCmd represents the run command
 var runCmd = &cobra.Command{
 	Use:   "run",
-	Short: "运行指定APP代理或者Dashboard端",
-	Long:  `运行指定APP代理或者Dashboard端`,
+	Short: "启动服务",
+	Long:  `启动服务`,
 	Run: func(cmd *cobra.Command, args []string) {
 		server.Run()
 	},

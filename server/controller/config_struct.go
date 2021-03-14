@@ -6,29 +6,27 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hellojqk/config/entity"
+	"github.com/hellojqk/config/server/entity"
 	"github.com/hellojqk/config/server/model"
 	"github.com/hellojqk/config/server/service"
-	util "github.com/hellojqk/config/tools/utils"
+	"github.com/hellojqk/config/util"
 )
 
-// ConfigStruct .
-type ConfigStruct struct {
+// ConfigStructController .
+type ConfigStructController struct {
 }
 
-var structConfigService = service.ConfigStruct{}
-
 // Insert .
-func (s *ConfigStruct) Insert(c *gin.Context) {
-	model := entity.ConfigStruct{}
-	if err := c.ShouldBind(&model); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+func (sc *ConfigStructController) Insert(c *gin.Context) {
+	param := entity.ConfigStruct{}
+	if err := c.ShouldBind(&param); err != nil {
+		c.JSON(http.StatusBadRequest, model.NewErrorResult(err))
 		return
 	}
 
-	result, err := structConfigService.InsertOne(context.Background(), model)
+	result, err := service.ConfigStructInsertOne(context.Background(), param)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		c.JSON(http.StatusBadRequest, model.NewErrorResult(err))
 		return
 	}
 	if !result {
@@ -38,22 +36,22 @@ func (s *ConfigStruct) Insert(c *gin.Context) {
 }
 
 // UpdateOne .
-func (s *ConfigStruct) UpdateOne(c *gin.Context) {
-	var uriModel model.URI
+func (sc *ConfigStructController) UpdateOne(c *gin.Context) {
+	var uriModel model.URIParam
 	if err := c.ShouldBindUri(&uriModel); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		c.JSON(http.StatusBadRequest, model.NewErrorResult(err))
 		return
 	}
 
-	model := entity.ConfigStruct{}
-	if err := c.ShouldBind(&model); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+	param := entity.ConfigStruct{}
+	if err := c.ShouldBind(&param); err != nil {
+		c.JSON(http.StatusBadRequest, model.NewErrorResult(err))
 		return
 	}
 
-	result, err := structConfigService.UpdateOne(context.Background(), uriModel.StructKey, model)
+	result, err := service.ConfigStructUpdateOne(context.Background(), uriModel.StructKey, param)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		c.JSON(http.StatusBadRequest, model.NewErrorResult(err))
 		return
 	}
 	if !result {
@@ -63,16 +61,16 @@ func (s *ConfigStruct) UpdateOne(c *gin.Context) {
 }
 
 // FindOne .
-func (s *ConfigStruct) FindOne(c *gin.Context) {
-	var uriModel model.URI
+func (sc *ConfigStructController) FindOne(c *gin.Context) {
+	var uriModel model.URIParam
 	if err := c.ShouldBindUri(&uriModel); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		c.JSON(http.StatusBadRequest, model.NewErrorResult(err))
 		return
 	}
-	fmt.Printf("key:%s\n", uriModel.StructKey)
-	result, err := structConfigService.FindOne(context.Background(), uriModel.StructKey)
+	fmt.Printf("key:%sc\n", uriModel.StructKey)
+	result, err := service.ConfigStructFindOne(context.Background(), uriModel.StructKey)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		c.JSON(http.StatusBadRequest, model.NewErrorResult(err))
 		return
 	}
 	c.JSON(http.StatusOK, result)
@@ -80,17 +78,17 @@ func (s *ConfigStruct) FindOne(c *gin.Context) {
 
 // Find .
 // /api/struct?page_num=1&page_size=10
-func (s *ConfigStruct) Find(c *gin.Context) {
+func (sc *ConfigStructController) Find(c *gin.Context) {
 	var param = entity.ListPagingParam{}
 	if err := c.ShouldBind(&param); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		c.JSON(http.StatusBadRequest, model.NewErrorResult(err))
 		return
 	}
 	util.PrintJSON("ConfigStruct Find", param)
 
-	total, result, err := structConfigService.Find(context.Background(), param)
+	total, result, err := service.ConfigStructFind(context.Background(), param)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		c.JSON(http.StatusBadRequest, model.NewErrorResult(err))
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"total": total, "data": result})

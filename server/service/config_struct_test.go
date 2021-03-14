@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/hellojqk/config/entity"
-	"github.com/hellojqk/config/repository"
+	"github.com/hellojqk/config/util"
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
@@ -42,43 +42,43 @@ func initConfig() {
 
 func TestMain(m *testing.M) {
 	initConfig()
-	repository.InitConn()
+	util.WaitInitFuncsExec()
 	os.Exit(m.Run())
 }
 
-func TestConfigStruct_InsertOne(t *testing.T) {
-	result, err := structConfigService.InsertOne(context.Background(), entity.ConfigStruct{Key: "key11"})
-	result, err = structConfigService.InsertOne(context.Background(), entity.ConfigStruct{Key: "key2"})
-	result, err = structConfigService.InsertOne(context.Background(), entity.ConfigStruct{Key: "key3"})
-	result, err = structConfigService.InsertOne(context.Background(), entity.ConfigStruct{Key: "key4"})
-	result, err = structConfigService.InsertOne(context.Background(), entity.ConfigStruct{Key: "key5"})
-	result, err = structConfigService.InsertOne(context.Background(), entity.ConfigStruct{Key: "key6"})
+func TestConfigStructInsertOne(t *testing.T) {
+	result, err := ConfigStructInsertOne(context.Background(), entity.ConfigStruct{Key: "key11"})
+	result, err = ConfigStructInsertOne(context.Background(), entity.ConfigStruct{Key: "key2"})
+	result, err = ConfigStructInsertOne(context.Background(), entity.ConfigStruct{Key: "key3"})
+	result, err = ConfigStructInsertOne(context.Background(), entity.ConfigStruct{Key: "key4"})
+	result, err = ConfigStructInsertOne(context.Background(), entity.ConfigStruct{Key: "key5"})
+	result, err = ConfigStructInsertOne(context.Background(), entity.ConfigStruct{Key: "key6"})
 	assert.Equal(t, nil, err)
 	t.Logf("%v\n", result)
 }
 
-func TestConfigStruct_FindOne(t *testing.T) {
-	result, err := structConfigService.FindOne(context.Background(), "key1")
+func TestConfigStructFindOne(t *testing.T) {
+	result, err := ConfigStructFindOne(context.Background(), "key1")
 	assert.Equal(t, nil, err)
 	t.Logf("%v\n", result)
 }
 
-func TestConfigStruct_Find(t *testing.T) {
-	total, result, err := structConfigService.Find(context.Background(), entity.ListPagingParam{PageNum: 1, PageSize: 10, Filter: bson.M{"key": bson.M{"$regex": "key"}}})
+func TestConfigStructFind(t *testing.T) {
+	total, result, err := ConfigStructFind(context.Background(), entity.ListPagingParam{PageNum: 1, PageSize: 10, Filter: bson.M{"key": bson.M{"$regex": "key"}}})
 	assert.Equal(t, nil, err)
 	t.Logf("%d\n%v\n", total, result)
 }
 
-func TestConfigStruct_UpdateOne(t *testing.T) {
-	result, err := structConfigService.UpdateOne(context.Background(), "key11", entity.ConfigStruct{Title: "title"})
+func TestConfigStructUpdateOne(t *testing.T) {
+	result, err := ConfigStructUpdateOne(context.Background(), "key11", entity.ConfigStruct{Title: "title"})
 	assert.Equal(t, nil, err)
 	t.Logf("%v\n", result)
 }
 
-func TestConfigStruct_Edit(t *testing.T) {
-	result, err := structConfigService.InsertOne(context.Background(), entity.ConfigStruct{Key: "key111"})
+func TestConfigStructEdit(t *testing.T) {
+	result, err := ConfigStructInsertOne(context.Background(), entity.ConfigStruct{Key: "key111"})
 
-	result, err = structConfigService.UpdateOne(context.Background(), "key111", entity.ConfigStruct{Title: "title"})
+	result, err = ConfigStructUpdateOne(context.Background(), "key111", entity.ConfigStruct{Title: "title"})
 	assert.Equal(t, nil, err)
 	t.Logf("%v\n", result)
 }

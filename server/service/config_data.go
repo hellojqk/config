@@ -5,23 +5,17 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/hellojqk/config/entity"
-	"github.com/hellojqk/config/repository"
-	util "github.com/hellojqk/config/tools/utils"
+	"github.com/hellojqk/config/server/entity"
+	"github.com/hellojqk/config/server/repository"
+	"github.com/hellojqk/config/util"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// ConfigData .
-type ConfigData struct {
-}
-
-var structDataService = ConfigData{}
-
 // getDataCollection .
 func getDataCollection(ctx context.Context, structKey string) (config *entity.ConfigStruct, collection *mongo.Collection, err error) {
-	config, err = structConfigService.FindOne(ctx, structKey)
+	config, err = ConfigStructFindOne(ctx, structKey)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -36,15 +30,15 @@ func getDataCollection(ctx context.Context, structKey string) (config *entity.Co
 	return
 }
 
-// InsertOne .
-func (s *ConfigData) InsertOne(ctx context.Context, structKey string, model entity.ConfigData) (result bool, err error) {
+// ConfigDataInsertOne .
+func ConfigDataInsertOne(ctx context.Context, structKey string, model entity.ConfigData) (result bool, err error) {
 
 	config, collection, err := getDataCollection(ctx, structKey)
 	if err != nil {
 		return false, err
 	}
 
-	model.SetCreator(0)
+	model.SetCreator("")
 	//如果是结构配置的不是数组结构，强制model中的key为structKey
 	if !config.Array {
 		model["key"] = structKey
@@ -58,8 +52,8 @@ func (s *ConfigData) InsertOne(ctx context.Context, structKey string, model enti
 	return insertResult.InsertedID != nil, nil
 }
 
-// FindOne .
-func (s *ConfigData) FindOne(ctx context.Context, structKey string, dataKey string) (result interface{}, err error) {
+// ConfigDataFindOne .
+func ConfigDataFindOne(ctx context.Context, structKey string, dataKey string) (result interface{}, err error) {
 	_, collection, err := getDataCollection(ctx, structKey)
 	if err != nil {
 		return nil, err
@@ -72,8 +66,8 @@ func (s *ConfigData) FindOne(ctx context.Context, structKey string, dataKey stri
 	return result, nil
 }
 
-// Find .
-func (s *ConfigData) Find(ctx context.Context, structKey string, param entity.ListPagingParam) (total int64, result []entity.ConfigData, err error) {
+// ConfigDataFind .
+func ConfigDataFind(ctx context.Context, structKey string, param entity.ListPagingParam) (total int64, result []entity.ConfigData, err error) {
 	if param.Filter == nil {
 		param.Filter = bson.M{}
 	}
@@ -102,24 +96,24 @@ func (s *ConfigData) Find(ctx context.Context, structKey string, param entity.Li
 	}
 
 	for cur.Next(ctx) {
-		model := entity.ConfigData{}
-		err := cur.Decode(&model)
+		param := entity.ConfigData{}
+		err := cur.Decode(&param)
 		if err != nil {
 			continue
 		}
-		result = append(result, model)
+		result = append(result, param)
 	}
 
 	return total, result, nil
 }
 
-// UpdateOne .
-func (s *ConfigData) UpdateOne(ctx context.Context, key string, model entity.ConfigData) (result bool, err error) {
+// ConfigDataUpdateOne .
+func ConfigDataUpdateOne(ctx context.Context, key string, model entity.ConfigData) (result bool, err error) {
 	_, collection, err := getDataCollection(ctx, key)
 	if err != nil {
 		return false, err
 	}
-	model.SetUpdater(0)
+	model.SetUpdater("")
 	updateResult, err := collection.UpdateOne(ctx, bson.M{"key": key}, bson.M{"$set": model})
 	if err != nil {
 		return false, err

@@ -6,36 +6,34 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hellojqk/config/entity"
+	"github.com/hellojqk/config/server/entity"
 	"github.com/hellojqk/config/server/model"
 	"github.com/hellojqk/config/server/service"
-	util "github.com/hellojqk/config/tools/utils"
+	"github.com/hellojqk/config/util"
 )
 
-// ConfigData .
-type ConfigData struct {
+// ConfigDataController .
+type ConfigDataController struct {
 }
 
-var structDataService = service.ConfigData{}
-
 // Insert .
-func (s *ConfigData) Insert(c *gin.Context) {
+func (dc *ConfigDataController) Insert(c *gin.Context) {
 
-	var uriModel model.URI
+	var uriModel model.URIParam
 	if err := c.ShouldBindUri(&uriModel); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		c.JSON(http.StatusBadRequest, model.NewErrorResult(err))
 		return
 	}
 
-	model := entity.ConfigData{}
-	if err := c.ShouldBind(&model); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+	param := entity.ConfigData{}
+	if err := c.ShouldBind(&param); err != nil {
+		c.JSON(http.StatusBadRequest, model.NewErrorResult(err))
 		return
 	}
 
-	result, err := structDataService.InsertOne(context.Background(), uriModel.StructKey, model)
+	result, err := service.ConfigDataInsertOne(context.Background(), uriModel.StructKey, param)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		c.JSON(http.StatusBadRequest, model.NewErrorResult(err))
 		return
 	}
 	if !result {
@@ -45,22 +43,22 @@ func (s *ConfigData) Insert(c *gin.Context) {
 }
 
 // UpdateOne .
-func (s *ConfigData) UpdateOne(c *gin.Context) {
-	var uriModel model.URI
+func (dc *ConfigDataController) UpdateOne(c *gin.Context) {
+	var uriModel model.URIParam
 	if err := c.ShouldBindUri(&uriModel); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		c.JSON(http.StatusBadRequest, model.NewErrorResult(err))
 		return
 	}
 
-	model := entity.ConfigData{}
-	if err := c.ShouldBind(&model); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+	param := entity.ConfigData{}
+	if err := c.ShouldBind(&param); err != nil {
+		c.JSON(http.StatusBadRequest, model.NewErrorResult(err))
 		return
 	}
 
-	result, err := structDataService.UpdateOne(context.Background(), uriModel.StructKey, model)
+	result, err := service.ConfigDataUpdateOne(context.Background(), uriModel.StructKey, param)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		c.JSON(http.StatusBadRequest, model.NewErrorResult(err))
 		return
 	}
 	if !result {
@@ -70,16 +68,16 @@ func (s *ConfigData) UpdateOne(c *gin.Context) {
 }
 
 // FindOne .
-func (s *ConfigData) FindOne(c *gin.Context) {
-	var uriModel model.URI
+func (dc *ConfigDataController) FindOne(c *gin.Context) {
+	var uriModel model.URIParam
 	if err := c.ShouldBindUri(&uriModel); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		c.JSON(http.StatusBadRequest, model.NewErrorResult(err))
 		return
 	}
-	fmt.Printf("key:%s\t%s\n", uriModel.StructKey, uriModel.DataKey)
-	result, err := structDataService.FindOne(context.Background(), uriModel.StructKey, uriModel.DataKey)
+	fmt.Printf("key:%dc\t%dc\n", uriModel.StructKey, uriModel.DataKey)
+	result, err := service.ConfigDataFindOne(context.Background(), uriModel.StructKey, uriModel.DataKey)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		c.JSON(http.StatusBadRequest, model.NewErrorResult(err))
 		return
 	}
 	c.JSON(http.StatusOK, result)
@@ -87,23 +85,23 @@ func (s *ConfigData) FindOne(c *gin.Context) {
 
 // Find .
 // /api/struct?page_num=1&page_size=10
-func (s *ConfigData) Find(c *gin.Context) {
-	var uriModel model.URI
+func (dc *ConfigDataController) Find(c *gin.Context) {
+	var uriModel model.URIParam
 	if err := c.ShouldBindUri(&uriModel); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		c.JSON(http.StatusBadRequest, model.NewErrorResult(err))
 		return
 	}
 
 	var param = entity.ListPagingParam{}
 	if err := c.ShouldBind(&param); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		c.JSON(http.StatusBadRequest, model.NewErrorResult(err))
 		return
 	}
 	util.PrintJSON("ConfigData Find", param)
 
-	total, result, err := structDataService.Find(context.Background(), uriModel.StructKey, param)
+	total, result, err := service.ConfigDataFind(context.Background(), uriModel.StructKey, param)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		c.JSON(http.StatusBadRequest, model.NewErrorResult(err))
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"total": total, "data": result})

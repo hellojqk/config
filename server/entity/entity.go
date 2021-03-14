@@ -12,26 +12,26 @@ type ListPagingParam struct {
 
 // Creator .
 type Creator struct {
-	ID        int64 `bson:"id,omitempty" json:"id"`
-	Timestamp int64 `bson:"timestamp,omitempty" json:"timestamp"`
+	Key       string `bson:"key,omitempty" json:"key"`
+	Timestamp int64  `bson:"timestamp,omitempty" json:"timestamp"`
 }
 
 // Set .
-func (m *Creator) Set(id int64, timestamp int64) {
-	m.ID = id
+func (m *Creator) Set(key string, timestamp int64) {
+	m.Key = key
 	m.Timestamp = timestamp
 }
 
 // Updater .
 type Updater struct {
-	ID        int64 `bson:"id,omitempty" json:"id"`
-	Timestamp int64 `bson:"timestamp,omitempty" json:"timestamp"`
+	Key       string `bson:"key,omitempty" json:"key"`
+	Timestamp int64  `bson:"timestamp,omitempty" json:"timestamp"`
 }
 
 var millisecond = int64(time.Millisecond)
 
 // Set .
-func (m *Updater) Set(id int64, timestamp int64) {
-	m.ID = id
+func (m *Updater) Set(key string, timestamp int64) {
+	m.Key = key
 	m.Timestamp = timestamp
 }

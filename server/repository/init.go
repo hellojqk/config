@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	util "github.com/hellojqk/config/tools/utils"
+	"github.com/hellojqk/config/util"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -20,28 +20,29 @@ var CLI *mongo.Client
 // DB .
 var DB *mongo.Database
 
-// InitConn 初始化连接
-func InitConn() {
+func init() {
+	util.WaitInitFuncsAdd(initMongoClient)
+}
+
+// initMongoClient 初始化连接
+func initMongoClient() (err error) {
 	connectionStr := viper.GetString("connectionString")
 	if connectionStr == "" {
-		panic("connectionStr is null")
+		return errors.New("connectionStr is null")
 	}
-	var err error
-
-	fmt.Println("connectionStr", connectionStr)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	CLI, err = mongo.Connect(ctx, options.Client().ApplyURI(connectionStr))
 	if err != nil {
-		panic(errors.Wrap(err, "mongodb Connect error"))
+		return errors.WithMessage(err, "mongodb Connect error")
 	}
 
 	ctx, cancel = context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 	err = CLI.Ping(ctx, readpref.Primary())
 	if err != nil {
-		panic(errors.Wrap(err, "mongodb Ping error"))
+		return errors.WithMessage(err, "mongodb Ping error")
 	}
 
 	var dataBaseName = viper.GetString("dataBase")
@@ -49,14 +50,14 @@ func InitConn() {
 
 	collectionNames, err := DB.ListCollectionNames(context.Background(), bsonx.Doc{})
 
-	var initCollections = []string{"config_struct", "config_data"}
+	var initCollections = []string{"config_struct", "config_data", "role", "user", "group"}
 	option := options.CreateCollection()
 	fmt.Printf("%v\n", collectionNames)
 	for _, collection := range initCollections {
 		if !util.ExistsInStringArray(collection, collectionNames) {
 			err := DB.CreateCollection(ctx, collection, option)
 			if err != nil {
-				panic(errors.Wrap(err, "mongodb Collection init"))
+				return errors.WithMessage(err, "mongodb Collection init")
 			}
 		}
 	}
@@ -67,9 +68,10 @@ func InitConn() {
 			Options: options.Index().SetUnique(true),
 		})
 		if err != nil {
-			panic(errors.Wrap(err, "mongodb index init"))
+			return errors.WithMessage(err, "mongodb index init")
 		}
 	}
+	return nil
 }
 
 // Close .
